@@ -795,7 +795,11 @@ void rzip_fd(rzip_control *control, int fd_in, int fd_out)
 		fatal("Failed to stat fd_in in rzip_fd\n");
 
 	if (!STDIN) {
-		len = control->st_size = s.st_size;
+		if (S_ISBLK(s.st_mode)) {
+			len = control->st_size = device_size(fd_in);
+		} else {
+			len = control->st_size = s.st_size;
+		}
 		print_verbose("File size: %lld\n", len);
 	} else
 		control->st_size = 0;
