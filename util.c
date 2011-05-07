@@ -41,6 +41,12 @@
 #endif
 #include <termios.h>
 
+#if defined(linux)
+#include <linux/fs.h>
+#elif defined(__APPLE__)
+#include <sys/disk.h>
+#endif
+
 #ifdef _SC_PAGE_SIZE
 # define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
 #else
@@ -265,4 +271,27 @@ void lrz_stretch(rzip_control *control)
 	sha4_finish(&ctx, control->hash);
 	memset(&ctx, 0, sizeof(ctx));
 	munlock(&ctx, sizeof(ctx));
+}
+
+i64 device_size(int fd)
+{
+	#if defined(linux)
+		i64 size = 0;
+		ioctl(fd, BLKGETSIZE64, &size);
+		return size;
+	#elif defined(__APPLE__)
+		int ret;
+		i32 block_size  = 0;
+		i64 block_count = 0;
+
+		ret = ioctl(fd, DKIOCGETBLOCKSIZE, &block_size);
+		if (ret) return 0;
+	
+		ret = ioctl(fd, DKIOCGETBLOCKCOUNT, &block_count);
+		if (ret) return 0;
+
+		return block_size * block_count;
+	#else
+		return 0;
+	#endif
 }

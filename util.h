@@ -32,6 +32,7 @@ void get_rand(uchar *buf, int len);
 void lrz_stretch(rzip_control *control);
 void lrz_stretch2(rzip_control *control);
 void lrz_crypt(const rzip_control *control, uchar *buf, i64 len, const uchar *salt, int encrypt);
+i64 device_size(int fd);
 
 #define LRZ_DECRYPT	(0)
 #define LRZ_ENCRYPT	(1)
