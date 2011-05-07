@@ -796,10 +796,10 @@ void rzip_fd(rzip_control *control, int fd_in, int fd_out)
 
 	if (!STDIN) {
 		if (S_ISBLK(s.st_mode)) {
-			len = control->st_size = device_size(fd_in);
-		} else {
-			len = control->st_size = s.st_size;
+			s.st_size = device_size(fd_in);
 		}
+		len = control->st_size = s.st_size;
+		
 		print_verbose("File size: %lld\n", len);
 	} else
 		control->st_size = 0;
